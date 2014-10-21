@@ -1,5 +1,10 @@
-require "spidercrawl/version"
+require "spidercrawl/spider_worker"
 
 module Spidercrawl
-  # Your code goes here...
+  class Spiderman
+  	def self.start(urls)
+  	  spiderman = SpiderWorker.new(urls, allow_redirections: false)
+  	  spiderman.crawl
+  	end
+  end
 end
