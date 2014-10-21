@@ -14,15 +14,15 @@ module Spidercrawl
 	end
 
 	def url
-	  url.to_s
+	  @url.to_s
 	end
 
 	def scheme
-	  url.scheme
+	  @url.scheme
 	end
 
 	def host
-	  url.host
+	  @url.host
 	end
 
 	def base_url
@@ -33,7 +33,7 @@ module Spidercrawl
 	# Return Nokogiri html document
 	#
 	def doc
-	  @document = Nokogiri::HTML(body)
+	  @document = Nokogiri::HTML(@body)
 	rescue Exception => e
 	  puts e.inspect
 	  puts e.backtrace
@@ -69,7 +69,7 @@ module Spidercrawl
 
     def emails
     end
-    
+
 	def images
 	end
 
@@ -77,15 +77,15 @@ module Spidercrawl
 	end
 
 	def redirect?
-	  (300..307).include?(code)
+	  (300..307).include?(@code)
 	end
 
 	def success?
-	  code == 200
+	  @code == 200
 	end
 
 	def not_found?
-	  code == 404
+	  @code == 404
 	end
 
 	#

@@ -3,8 +3,10 @@ require 'net/http'
 
 module Spidercrawl
   # Makes the request to the targeted website
-  class Fetch
+  class Request
 
+  	attr_accessor :url
+  	
   	def initialize(url, options = {})
   	  @url = url
   	  @timeout = options[:timeout]
@@ -14,8 +16,8 @@ module Spidercrawl
   	# Fetch a page from the given *url*
   	#
   	def fetch
-	  puts "fetching #{url}"
-	  uri = URI(url)
+	  puts "fetching #{@url}"
+	  uri = URI(@url)
 	  start_time = Time.now
 	  begin
 		  Net::HTTP.start(uri.host, uri.port) do |http|

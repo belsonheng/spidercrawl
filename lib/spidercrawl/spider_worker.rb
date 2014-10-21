@@ -1,40 +1,41 @@
-require 'spidercrawl/fetch'
+require 'spidercrawl/request'
+require 'spidercrawl/page'
 
 module Spidercrawl
   # Start working hard
   class SpiderWorker
+
+    attr_reader :page
 
   	def initialize(url, options = {})
   	  @url = url
   	  @headers = options[:headers]
   	  @timeout = options[:timeout]
   	  @allow_redirections = options[:allow_redirections]
-  	  @max_pages = option[:max_pages]
-  	  @pattern = Regex.new('^(http)(:)(\\/)(\\/)(forums\\.hardwarezone\\.com\\.sg)(\\/)(hwm)(-)(magazine)(-)(publication)(-)(38)(\\/).*?(\\.)(html)$')
-  	  @link_queue = Queue.new
-  	  @visited_links = []
-  	  @page_count = 0
+  	  @max_pages = options[:max_pages]
+  	  @pattern = Regexp.new('http:\/\/forums\.hardwarezone\.com\.sg\/hwm-magazine-publication-38\/?(.*\.html)?')
   	end
 
-  	def crawl
-  	  link_queue << url
-  	  begin
-  	  	url = link_queue.pop
-  	    next unless url.match(pattern) && !visited_links.include?(url)
-  	    spider_worker = Fetch.new(url)
-  	    @page = spider_worker.fetch
+    def crawl(url)
+      link_queue = Queue.new
+      pages, visited_links = [], []
+      link_queue << @url
 
-  	    if page.success? then
-          page_count += 1
-	        page.links.each { |link| link_queue << link if link.match(pattern) && !visited_links.include?(link) }
-  	    elsif page.redirect? then 
-  	  	  puts "redirected to #{page.redirect_url}" if allow_redirections
-  	    elsif page.not_found? then
-	  	    puts "page not found"
-  	    end
-
-  	    break if page_count == max_pages
-  	  end until link_queue.empty?
-	  end
+      loop do
+        url = link_queue.pop
+        next if visited_links.include?(url) || url != url.match(@pattern)[0]
+        spider_worker = Request.new(url)
+        page = spider_worker.fetch
+        if page.success? then
+          pages << page
+        elsif page.redirect? then
+          puts "**redirect to #{page.redirect_url}"
+          spider_worker.url = page.redirect_url
+          spider_worker.fetch
+        elsif page.not_found? then
+          puts "page not found"
+        end
+      end until link_queue.empty?
+    end
   end
 end
