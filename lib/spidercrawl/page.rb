@@ -4,6 +4,8 @@ module Spidercrawl
   # Parses the content with Nokogiri
   class Page
 
+    attr_reader :location
+    
 	def initialize(url, options = {})
 	  @url = url
 	  @code = options[:response_code]
@@ -26,7 +28,7 @@ module Spidercrawl
 	end
 
 	def base_url
-	  @base_url = "#{url.scheme}://#{url.host}"
+	  @base_url = "#{scheme}://#{host}"
 	end
 
 	#
@@ -50,8 +52,8 @@ module Spidercrawl
 	# Return the entire links found in the page; exclude empty links
 	#
 	def links
-	  @links = doc.css('a').map { |link| link['href'].to_s }.uniq.delete_if { |href| href.empty? }.map { |link| absolutify(link) }
-	end
+	  @links = doc.css('a').map { |link| link['href'].to_s }.uniq.delete_if { |href| href.empty? }.map { |link| absolutify(link) }.uniq
+    end
 
 	#
 	# Return the internal links found in the page
@@ -76,24 +78,25 @@ module Spidercrawl
 	def content_type
 	end
 
-	def redirect?
-	  (300..307).include?(@code)
-	end
-
-	def success?
-	  @code == 200
-	end
-
 	def not_found?
 	  @code == 404
 	end
 
+    def success?
+      @code == 200
+    end
+
+    def redirect?
+      (300..307).include?(@code)
+    end
+
 	#
-	# Return the absolute url
+	# Return the absolute url without query params, etc.
 	#
 	private
 	def absolutify(page_url)
-	  return page_url if URI(page_url.split('?')[0]).absolute?
+      page_url = page_url.split('?')[0].split('#')[0]
+	  return page_url if URI(page_url).absolute?
 	  URI.join(base_url, page_url).to_s
 	end
   end

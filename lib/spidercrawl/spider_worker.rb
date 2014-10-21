@@ -13,24 +13,25 @@ module Spidercrawl
   	  @timeout = options[:timeout]
   	  @allow_redirections = options[:allow_redirections]
   	  @max_pages = options[:max_pages]
-  	  @pattern = Regexp.new('http:\/\/forums\.hardwarezone\.com\.sg\/hwm-magazine-publication-38\/?(.*\.html)?')
+  	  @pattern = Regexp.new('^http:\/\/forums\.hardwarezone\.com\.sg\/hwm-magazine-publication-38\/?(.*\.html)?$')
   	end
 
-    def crawl(url)
+    def crawl
       link_queue = Queue.new
       pages, visited_links = [], []
       link_queue << @url
-
-      loop do
+      begin
         url = link_queue.pop
-        next if visited_links.include?(url) || url != url.match(@pattern)[0]
+        next if visited_links.include?(url) || url !~ @pattern
+        visited_links << url
         spider_worker = Request.new(url)
         page = spider_worker.fetch
         if page.success? then
           pages << page
+          page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
         elsif page.redirect? then
-          puts "**redirect to #{page.redirect_url}"
-          spider_worker.url = page.redirect_url
+          puts "**redirect to #{page.location}"
+          spider_worker.url = page.location
           spider_worker.fetch
         elsif page.not_found? then
           puts "page not found"

@@ -6,7 +6,7 @@ module Spidercrawl
   class Request
 
   	attr_accessor :url
-  	
+
   	def initialize(url, options = {})
   	  @url = url
   	  @timeout = options[:timeout]
@@ -25,19 +25,19 @@ module Spidercrawl
 		  	  end_time = Time.now
 		      case response
 			  when Net::HTTPSuccess then
-		  	    page = Page.new(uri, response_code: response.code,
+		  	    page = Page.new(uri, response_code: response.code.to_i,
 		  	    					 response_head: response['headers'],
 			  	  					 response_body: response.body,
 			  	  					 response_time: ((end_time-start_time)*1000).round)
 			  when Net::HTTPRedirection then
-				page = Page.new(uri, response_code: response.code,
+				page = Page.new(uri, response_code: response.code.to_i,
 				  					 response_head: response['headers'],
 				  					 response_body: response.body,
 				  					 response_time: ((end_time-start_time)*1000).round,
 				  					 redirect_url:  response['location'])
 		       	  
 		  	  when Net::HTTPNotFound then
-		  	  	page = Page.new(uri, response_code: response.code,
+		  	  	page = Page.new(uri, response_code: response.code.to_i,
 		  	  						 response_time: ((end_time-start_time)*1000).round)
 		  	  end
 		  end
