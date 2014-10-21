@@ -5,7 +5,7 @@ module Spidercrawl
   class Page
 
     attr_reader :location
-    
+
 	def initialize(url, options = {})
 	  @url = url
 	  @code = options[:response_code]
@@ -15,24 +15,36 @@ module Spidercrawl
 	  @time = options[:response_time]
 	end
 
+    #
+    # Return the url of the page
+    #
 	def url
 	  @url.to_s
 	end
 
+    #
+    # Return the url scheme of the page (e.g. http, https, etc.)
+    #
 	def scheme
 	  @url.scheme
 	end
 
+    #
+    # Return the url host of the page
+    #
 	def host
 	  @url.host
 	end
 
+    #
+    # Return the base url of the page
+    #
 	def base_url
 	  @base_url = "#{scheme}://#{host}"
 	end
 
 	#
-	# Return Nokogiri html document
+	# Return the Nokogiri html document
 	#
 	def doc
 	  @document = Nokogiri::HTML(@body)
@@ -41,6 +53,9 @@ module Spidercrawl
 	  puts e.backtrace
 	end
 
+    def headers
+      @headers['Content-Type']
+    end
 	#
 	# Return the title of the page
 	#
@@ -78,14 +93,30 @@ module Spidercrawl
 	def content_type
 	end
 
+    #
+    # Return the time taken to fetch the page in ms
+    #
+    def response_time
+      @time
+    end
+
+    #
+    # Return true if page not found 
+    #
 	def not_found?
 	  @code == 404
 	end
 
+    #
+    # Return true if page is fetched successfully
+    #
     def success?
       @code == 200
     end
 
+    #
+    # Return true if page is redirected
+    #
     def redirect?
       (300..307).include?(@code)
     end

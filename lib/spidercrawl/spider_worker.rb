@@ -26,17 +26,21 @@ module Spidercrawl
         visited_links << url
         spider_worker = Request.new(url)
         page = spider_worker.fetch
-        if page.success? then
+
+        if page.success? || page.redirect? then
+          while page.redirect?
+            #puts "**redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")
+            break if visited_links.include?(page.location)
+            visited_links << (spider_worker.url = page.location)
+            page = spider_worker.fetch
+          end
           pages << page
           page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
-        elsif page.redirect? then
-          puts "**redirect to #{page.location}"
-          spider_worker.url = page.location
-          spider_worker.fetch
         elsif page.not_found? then
           puts "page not found"
         end
       end until link_queue.empty?
+      pages
     end
   end
 end
