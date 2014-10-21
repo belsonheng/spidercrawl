@@ -67,6 +67,9 @@ module Spidercrawl
 	  @external_links = links.select { |link| URI(link).host != host }
 	end
 
+    def emails
+    end
+    
 	def images
 	end
 

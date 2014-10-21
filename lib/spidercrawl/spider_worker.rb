@@ -2,14 +2,7 @@ require 'spidercrawl/fetch'
 
 module Spidercrawl
   # Start working hard
-  Class SpiderWorker
-
-  	DEFAULT_OPTS = {
-  	  :threads => 1
-  	  :headers => "Spider-Crawl"
-  	  :delay => 0
-  	  :pattern => 
-  	}
+  class SpiderWorker
 
   	def initialize(url, options = {})
   	  @url = url
@@ -31,18 +24,17 @@ module Spidercrawl
   	    spider_worker = Fetch.new(url)
   	    @page = spider_worker.fetch
 
-  	    if page.success?
-	      page.links.each do |link| 
-	  	    link_queue << link if link.match(pattern) && !@visited_links.include?(link)
-	      end
-	    elsif page.redirect?
-	  	  puts "redirected to #{page.redirect_url}" if allow_redirections
-	    elsif page.not_found?
-	  	  puts "page not found"
+  	    if page.success? then
+          page_count += 1
+	        page.links.each { |link| link_queue << link if link.match(pattern) && !visited_links.include?(link) }
+  	    elsif page.redirect? then 
+  	  	  puts "redirected to #{page.redirect_url}" if allow_redirections
+  	    elsif page.not_found? then
+	  	    puts "page not found"
   	    end
 
   	    break if page_count == max_pages
-  	  end until @link_queue.empty?
+  	  end until link_queue.empty?
 	  end
   end
 end
