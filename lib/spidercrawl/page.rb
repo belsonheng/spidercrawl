@@ -54,20 +54,20 @@ module Spidercrawl
 	end
 
     def headers
-      @headers['Content-Type']
+      puts @headers
     end
 	#
 	# Return the title of the page
 	#
 	def title
-	  @title = doc.css('head title').inner_text rescue nil
+	  @title = doc.css('head title').inner_text
 	end
 
 	#
 	# Return the entire links found in the page; exclude empty links
 	#
 	def links
-	  @links = doc.css('a').map { |link| link['href'].to_s }.uniq.delete_if { |href| href.empty? }.map { |link| absolutify(link) }.uniq
+	  @links = doc.css('a').map { |link| link['href'].to_s }.compact.uniq.map { |link| absolutify(link) }
     end
 
 	#
@@ -85,13 +85,55 @@ module Spidercrawl
 	end
 
     def emails
+      @body.match(/[\w.!#\$%+-]+@[\w-]+(?:\.[\w-]+)+/)
     end
 
+    #
+    # Return all images found in the page
+    #
 	def images
+      @images = doc.css('img').map { |img| img['src'].to_s }.compact.uniq
 	end
 
+    def words
+      @words = text.split(/[^a-zA-Z]/).delete_if { |word| word.empty? }
+    end
+
+    #
+    # Return css scripts of the page
+    #
+    def css
+      @css = doc.search("[@type='text/css']")
+    end
+
+    def meta_keywords
+
+    end
+
+    def meta_descriptions
+
+    end
+
+    #
+    # Return html content as a string
+    #
+    def content
+      @body.to_s
+    end
+
+    #
+    # Return the content type of the page
+    #
 	def content_type
-	end
+	  doc.at("meta[@http-equiv='Content-Type']")
+    end
+
+    #
+    # Return plain text of the page without html tags
+    #
+    def text
+      @text = doc.text
+    end
 
     #
     # Return the time taken to fetch the page in ms

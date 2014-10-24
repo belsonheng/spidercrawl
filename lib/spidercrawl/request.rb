@@ -13,7 +13,7 @@ module Spidercrawl
   	end
   	
   	#
-  	# Fetch a page from the given *url*
+  	# Fetch a page from the given url
   	#
   	def fetch
 	  puts "fetching #{@url}"

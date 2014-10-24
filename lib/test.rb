@@ -4,7 +4,8 @@ pages = Spiderman.shoot('http://forums.hardwarezone.com.sg/hwm-magazine-publicat
 
 pages.each do |page| 
 	puts "#{page.url}"
-	puts "Title #{page.title}"
+	puts "Images #{page.images}"
+	puts "Emails #{page.emails}"
 	puts "Header #{page.headers}"
 end
 
