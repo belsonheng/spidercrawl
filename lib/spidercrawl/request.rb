@@ -26,12 +26,12 @@ module Spidercrawl
 		      case response
 			  when Net::HTTPSuccess then
 		  	    page = Page.new(uri, response_code: response.code.to_i,
-		  	    					 response_head: response['headers'],
+		  	    					 response_head: response.instance_variable_get("@header"),
 			  	  					 response_body: response.body,
 			  	  					 response_time: ((end_time-start_time)*1000).round)
 			  when Net::HTTPRedirection then
 				page = Page.new(uri, response_code: response.code.to_i,
-				  					 response_head: response['headers'],
+				  					 response_head: response.instance_variable_get("@header"),
 				  					 response_body: response.body,
 				  					 response_time: ((end_time-start_time)*1000).round,
 				  					 redirect_url:  response['location'])

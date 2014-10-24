@@ -14,7 +14,9 @@ module Spidercrawl
   	  @allow_redirections = options[:allow_redirections]
   	  @max_pages = options[:max_pages]
   	  @pattern = Regexp.new('^http:\/\/forums\.hardwarezone\.com\.sg\/hwm-magazine-publication-38\/?(.*\.html)?$')
-  	end
+      @setup = nil
+      @teardown = nil
+    end
 
     def crawl
       link_queue = Queue.new
@@ -25,8 +27,9 @@ module Spidercrawl
         next if visited_links.include?(url) || url !~ @pattern
         visited_links << url
         spider_worker = Request.new(url)
-        page = spider_worker.fetch
-
+        proceed = @setup.call(url) unless @setup.nil?
+        page = spider_worker.fetch if proceed
+        @after_spider_crawl
         if page.success? || page.redirect? then
           while page.redirect?
             #puts "**redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")
@@ -41,6 +44,22 @@ module Spidercrawl
         end
       end until link_queue.empty?
       pages
+    end
+
+    def before_spider_crawl(&block)
+      @setup = block if block_given?
+    end
+
+    def on_spider_crawl(&block)
+      
+    end
+
+    def after_spider_crawl(&block)
+      @teardown = block if block_given?
+    end
+
+    def on()
+
     end
   end
 end
