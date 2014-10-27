@@ -1,6 +1,8 @@
 # SpiderCrawl
 
-A ruby gem that can crawl a domain and let you have information about the pages it visits. With the help of Nokogiri, SpiderCrawl will parse each page and return you its title, links, css, words, and many many more! You can also customize what you want to do before & after each fetch request.
+A ruby gem that can crawl a domain and let you have information about the pages it visits. 
+
+With the help of Nokogiri, SpiderCrawl will parse each page and return you its title, links, css, words, and many many more! You can also customize what you want to do before & after each fetch request.
 
 Long story short - Feed an URL to SpiderCrawl and it will crawl + scrape the content for you. 
 
