@@ -30,7 +30,8 @@ module Spidercrawl
             page = Page.new(uri, response_code: response.code.to_i,
                                  response_head: response.instance_variable_get("@header"),
                                  response_body: response.body,
-                                 response_time: ((end_time-start_time)*1000).round)
+                                 response_time: ((end_time-start_time)*1000).round,
+                                 crawled_time: (Time.now.to_f*1000).to_i)
           when Net::HTTPRedirection then
             page = Page.new(uri, response_code: response.code.to_i,
                                  response_head: response.instance_variable_get("@header"),
