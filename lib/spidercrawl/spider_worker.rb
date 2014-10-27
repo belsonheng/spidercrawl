@@ -7,13 +7,13 @@ module Spidercrawl
 
     attr_reader :page
 
-  	def initialize(url, options = {})
-  	  @url = url
-  	  @headers = options[:headers]
-  	  @timeout = options[:timeout] ? options[:timeout] : 20
-  	  @allow_redirections = options[:allow_redirections]
-  	  @max_pages = options[:max_pages]
-  	  @pattern = options[:pattern]
+    def initialize(url, options = {})
+      @url = url
+      #@headers = options[:headers]
+      @timeout = options[:timeout] ? options[:timeout] : 20 # default 20 seconds
+      @allow_redirections = options[:allow_redirections]
+      @max_pages = options[:max_pages]
+      @pattern = options[:pattern]
       @setup = nil
       @teardown = nil
     end
