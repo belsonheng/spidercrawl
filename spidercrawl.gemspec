@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Spidercrawl::VERSION
   spec.authors       = ["Belson Heng"]
   spec.email         = ["belsonheng@gmail.com"]
-  spec.summary       = %q{...}
-  spec.description   = %q{...}
-  spec.homepage      = ""
+  spec.summary       = %q{A ruby gem that can crawl a domain and let you have information about the pages it visits.}
+  spec.description   = %q{With the help of Nokogiri, SpiderCrawl will parse each page and return you its title, links, css, words, and many many more! You can also customize what you want to do before & after each fetch request.}
+  spec.homepage      = "http://github.com/belsonheng/spidercrawl"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
