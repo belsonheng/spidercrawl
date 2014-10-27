@@ -1,6 +1,10 @@
-# Spidercrawl
+# SpiderCrawl
 
-TODO: Write a gem description
+A ruby gem that can crawl a domain and let you have information about the pages it visits. 
+
+With the help of Nokogiri, SpiderCrawl will parse each page and return you its title, links, css, words, and many many more! You can also customize what you want to do before & after each fetch request.
+
+Long story short - Feed an URL to SpiderCrawl and it will crawl + scrape the content for you. 
 
 ## Installation
 
@@ -20,7 +24,14 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Start crawling a domain by calling __Spiderman.shoot__(*url*) and it will return you a list of pages it has crawled and scraped:
+
+        pages = Spiderman.shoot('http://forums.hardwarezone.com.sg/hwm-magazine-publication-38/')
+
+To include a pattern matching for each page:
+
+        pages = Spiderman.shoot('http://forums.hardwarezone.com.sg/hwm-magazine-publication-38/',
+                :pattern => Regexp.new('^http:\/\/forums\.hardwarezone\.com\.sg\/hwm-magazine-publication-38\/?(.*\.html)?$')
 
 ## Contributing
 
@@ -29,3 +40,7 @@ TODO: Write usage instructions here
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+## License
+
+SpiderCrawl is released under the [MIT license](https://github.com/belsonheng/spidercrawl/blob/master/LICENSE.txt).
