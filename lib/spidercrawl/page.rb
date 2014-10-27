@@ -4,7 +4,7 @@ module Spidercrawl
   # Parses the content with Nokogiri
   class Page
 
-    attr_reader :location
+    attr_reader :location, :response_time, :crawled_time
 
     def initialize(url, options = {})
       @url = url
@@ -12,7 +12,8 @@ module Spidercrawl
       @headers = options[:response_head]
       @location = options[:redirect_url]
       @body = options[:response_body]
-      @time = options[:response_time]
+      @response_time = options[:response_time]
+      @crawled_time = options[:crawled_time]
     end
 
     #
@@ -150,13 +151,6 @@ module Spidercrawl
     #
     def response_code
       @code
-    end
-
-    #
-    # Return the time taken to fetch the page in ms
-    #
-    def response_time
-      @time
     end
 
     #
