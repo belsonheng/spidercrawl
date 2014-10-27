@@ -26,14 +26,14 @@ Or install it yourself as:
 
 Start crawling a domain by calling __Spiderman.shoot__(*url*) and it will return you a list of pages it has crawled and scraped:
 
-        pages = Spiderman.shoot('http://forums.hardwarezone.com.sg/hwm-magazine-publication-38/')
+    pages = Spiderman.shoot('http://forums.hardwarezone.com.sg/hwm-magazine-publication-38/')
 
 To include a pattern matching for each page:
 
-        pages = Spiderman.shoot('http://forums.hardwarezone.com.sg/hwm-magazine-publication-38/',
-                :pattern => Regexp.new('^http:\/\/forums\.hardwarezone\.com\.sg\/hwm-magazine-publication-38\/?(.*\.html)?$')
+    pages = Spiderman.shoot('http://forums.hardwarezone.com.sg/hwm-magazine-publication-38/',
+                            :pattern => Regexp.new('^http:\/\/forums\.hardwarezone\.com\.sg\/hwm-magazine-publication-38\/?(.*\.html)?$')
 
-## Future TODO
+## Future ::TODO::
 
 1. include asynchronous fetch using [Typhoeus](https://github.com/typhoeus/typhoeus)
 2. use peach for parallel each
