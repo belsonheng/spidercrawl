@@ -1,8 +1,8 @@
 # SpiderCrawl
 
-A web spider framework that can crawl urls and collect useful information about the pages it visits. You can customize your own actions to perform before & after each http fetch request from the website.
+A web spider framework that can crawl urls and collect useful information about the pages it visits. You can customize your own actions to perform before & after each http fetch request from the website, and many more!
 
-In short, feed an URL to SpiderCrawl and it will crawl + scape the content for you. 
+Long story short; Feed an URL to SpiderCrawl and it will crawl + scape the content for you. 
 
 ## Installation
 
@@ -34,4 +34,4 @@ TODO: Write usage instructions here
 
 ## License
 
-SpiderCrawl is released under the MIT license(https://github.com/belsonheng/spidercrawl/blob/master/LICENSE.txt).
+SpiderCrawl is released under the [MIT license](https://github.com/belsonheng/spidercrawl/blob/master/LICENSE.txt).
