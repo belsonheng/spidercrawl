@@ -55,14 +55,15 @@ module Spidercrawl
     end
 
     def on()
-
+      # TODO :success, :failure, :redirect
     end
 
     private
     def process_page(uri, response)
       page = Page.new(uri, response_code: response.code.to_i,
                            response_head: response.instance_variable_get("@header"),
-                           response_body: response.body)
+                           response_body: response.body
+                           crawled_time: (Time.now.to_f*1000).to_i)
     end
   end
 end
