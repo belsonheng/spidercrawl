@@ -1,6 +1,8 @@
-# Spidercrawl
+# SpiderCrawl
 
-TODO: Write a gem description
+A web spider framework that can crawl urls and collect useful information about the pages it visits. You can customize your own actions to perform before & after each http fetch request from the website.
+
+In short, feed an URL to SpiderCrawl and it will crawl + scape the content for you. 
 
 ## Installation
 
@@ -29,3 +31,7 @@ TODO: Write usage instructions here
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+## License
+
+SpiderCrawl is released under the MIT license(https://github.com/belsonheng/spidercrawl/blob/master/LICENSE.txt).
