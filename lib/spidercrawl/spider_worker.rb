@@ -13,7 +13,7 @@ module Spidercrawl
   	  @timeout = options[:timeout]
   	  @allow_redirections = options[:allow_redirections]
   	  @max_pages = options[:max_pages]
-  	  @pattern = Regexp.new('^http:\/\/forums\.hardwarezone\.com\.sg\/hwm-magazine-publication-38\/?(.*\.html)?$')
+  	  @pattern = options[:pattern]
       @setup = nil
       @teardown = nil
     end
@@ -27,9 +27,8 @@ module Spidercrawl
         next if visited_links.include?(url) || url !~ @pattern
         visited_links << url
         spider_worker = Request.new(url)
-        proceed = @setup.call(url) unless @setup.nil?
-        page = spider_worker.fetch if proceed
-        @after_spider_crawl
+        response = @setup.yield url unless @setup.nil?
+        page = response ? process_page(URI(url), response) : spider_worker.fetch
         if page.success? || page.redirect? then
           while page.redirect?
             #puts "**redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")
@@ -42,24 +41,28 @@ module Spidercrawl
         elsif page.not_found? then
           puts "page not found"
         end
+        @teardown.yield url, page unless @teardown.nil?
       end until link_queue.empty?
       pages
     end
 
-    def before_spider_crawl(&block)
-      @setup = block if block_given?
+    def before_fetch(&block)
+      @setup = block if block
     end
 
-    def on_spider_crawl(&block)
-      
-    end
-
-    def after_spider_crawl(&block)
-      @teardown = block if block_given?
+    def after_fetch(&block)
+      @teardown = block if block
     end
 
     def on()
 
+    end
+
+    private
+    def process_page(uri, response)
+      page = Page.new(uri, response_code: response.code.to_i,
+                           response_head: response.instance_variable_get("@header"),
+                           response_body: response.body)
     end
   end
 end
