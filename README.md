@@ -1,8 +1,8 @@
 # SpiderCrawl
 
-A web spider framework that can crawl urls and collect useful information about the pages it visits. You can customize your own actions to perform before & after each http fetch request from the website, and many more!
+A web spider framework that can crawl a domain and let you have information about the pages it visits. This includes title, links, css, words, etc. You can also customize what you want to do before & after each fetch request from the target url, and many many more!
 
-Long story short; Feed an URL to SpiderCrawl and it will crawl + scape the content for you. 
+Long story short - Feed an URL to SpiderCrawl and it will crawl + scrape the content for you. 
 
 ## Installation
 
