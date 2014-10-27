@@ -10,7 +10,7 @@ module Spidercrawl
   	def initialize(url, options = {})
   	  @url = url
   	  @headers = options[:headers]
-  	  @timeout = options[:timeout]
+  	  @timeout = options[:timeout] ? options[:timeout] : 20
   	  @allow_redirections = options[:allow_redirections]
   	  @max_pages = options[:max_pages]
   	  @pattern = options[:pattern]
@@ -26,12 +26,12 @@ module Spidercrawl
         url = link_queue.pop
         next if visited_links.include?(url) || url !~ @pattern
         visited_links << url
-        spider_worker = Request.new(url)
+        spider_worker = Request.new(url, :timeout => @timeout)
         response = @setup.yield url unless @setup.nil?
-        page = response ? process_page(URI(url), response) : spider_worker.fetch
+        page = (response ? process_page(URI(url), response) : spider_worker.fetch)
         if page.success? || page.redirect? then
           while page.redirect?
-            #puts "**redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")
+            puts "**redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")
             break if visited_links.include?(page.location)
             visited_links << (spider_worker.url = page.location)
             page = spider_worker.fetch
