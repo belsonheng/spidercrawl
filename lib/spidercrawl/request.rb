@@ -1,6 +1,7 @@
 require 'spidercrawl/page'
 require 'spidercrawl/user_agents'
 require 'net/http'
+require 'curb'
 require 'colorize'
 #require 'typhoeus'
 
@@ -18,6 +19,44 @@ module Spidercrawl
       @http = Net::HTTP.new(@uri.host, @uri.port) do |http|
         http.open_timeout = @timeout # in seconds
         http.read_timeout = @timeout # in seconds
+      end
+
+      @c = Curl::Easy.new(@uri.to_s) do |curl|
+        curl.headers['User-Agent'] = UserAgents.random
+      end
+    end
+
+    #
+    # Fetch a page from the given url using libcurl
+    #
+    def curl
+      puts "fetching #{@uri.to_s}".green.on_black
+      start_time = Time.now
+      begin
+        c = @c
+        c.url = @uri.to_s
+        c.perform
+        end_time = Time.now
+        case c.response_code
+        when 200 then
+          page = Page.new(@uri, response_code: c.response_code,
+                                response_head: c.header_str,
+                                response_body: c.body_str,
+                                response_time: ((end_time-start_time)*1000).round,
+                                crawled_time: (Time.now.to_f*1000).to_i)
+        when 300..307 then
+          page = Page.new(@uri, response_code: c.response_code,
+                                response_head: c.header_str,
+                                response_body: c.body_str,
+                                response_time: ((end_time-start_time)*1000).round,
+                                redirect_url:  c.redirect_url)
+        when 404 then
+          page = Page.new(@uri, response_code: c.response_code,
+                                response_time: ((end_time-start_time)*1000).round)
+        end
+      rescue Exception => e
+        puts e.inspect
+        puts e.backtrace
       end
     end
 

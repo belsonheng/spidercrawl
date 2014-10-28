@@ -34,21 +34,21 @@ module Spidercrawl
         spider_worker.uri = URI.parse(url)
 
         response = @setup.yield url unless @setup.nil?
-        page = (response ? setup_page(URI(url), response) : spider_worker.fetch)
+        page = (response ? setup_page(URI(url), response) : spider_worker.curl)
 
         if page.success? || page.redirect? then
           while page.redirect?
-            puts ("**redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")).yellow.on_black
+            puts ("### redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")).white.on_black
             break if visited_links.include?(page.location)
-            visited_links << (spider_worker.uri = URI.parse(page.location))
-            page = spider_worker.fetch
+            visited_links << (spider_worker.uri = URI.parse(page.location)).to_s
+            page = spider_worker.curl
           end
           pages << page
           page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
         elsif page.not_found? then
           puts "page not found"
         end
-        @teardown.yield urls, page unless @teardown.nil?
+        @teardown.yield url, page unless @teardown.nil?
         sleep @delay
       end until link_queue.empty?
       puts "Total pages crawled: #{visited_links.size}"
