@@ -33,17 +33,9 @@ To include a pattern matching for each page:
     pages = Spiderman.shoot('http://forums.hardwarezone.com.sg/hwm-magazine-publication-38/',
                             :pattern => Regexp.new('^http:\/\/forums\.hardwarezone\.com\.sg\/hwm-magazine-publication-38\/?(.*\.html)?$')
 
-## Future ::TODO::
-
-1. include asynchronous fetch using [Typhoeus](https://github.com/typhoeus/typhoeus)
-2. use peach for parallel each
-3. run benchmark test
-4. robotex to obey robots rule
-5. redis-bloomfilter for checking visited urls
-
 ## Dependencies
 
-Nokogiri 1.6          # For parsing html files
+Nokogiri 1.6
 
 ## Contributing
 
