@@ -1,5 +1,7 @@
 require 'spidercrawl/page'
+require 'spidercrawl/user_agents'
 require 'net/http'
+require 'typhoeus'
 
 module Spidercrawl
   # Makes the request to the targeted website
@@ -9,6 +11,7 @@ module Spidercrawl
 
     def initialize(url, options = {})
       @url = url
+      @threads = options[:threads]
       @timeout = options[:timeout]
     end
 
@@ -47,6 +50,34 @@ module Spidercrawl
         puts e.inspect
         puts e.backtrace
       end
+    end
+  end
+  # Makes parallel requests to the targeted website using typhoeus and hydra
+  class ParallelRequest
+    
+    def initialize(urls, options = {})
+      @urls = urls
+      @threads = options[:threads]
+      @timeout = options[:timeout]
+    end
+
+    #
+    # Fetch page(s) from the given url(s)
+    #
+    def fetch
+      hydra = Typhoeus::Hydra.new(:max_concurrency => @threads)
+
+      @urls.each do |url|
+        puts "fetching #{url}"
+        request = Typhoeus::Request.new(url, :timeout => @timeout, :follow_location => false, :headers => {"User-Agent" => UserAgents.random})
+        request.on_headers do |response|
+          puts "Success: #{url}" if response.success?
+          puts "Redirect: #{response.headers['Location']}" if (300..307).include?(response.code)
+        end
+        hydra.queue(request)
+      end
+
+      hydra.run
     end
   end
 end

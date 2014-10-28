@@ -10,6 +10,7 @@ module Spidercrawl
     def initialize(url, options = {})
       @url = url
       #@headers = options[:headers]
+      @threads = options[:threads] ? options[:threads] : 10 # default 10 seconds
       @timeout = options[:timeout] ? options[:timeout] : 20 # default 20 seconds
       @allow_redirections = options[:allow_redirections]
       @max_pages = options[:max_pages]
@@ -26,7 +27,7 @@ module Spidercrawl
         url = link_queue.pop
         next if visited_links.include?(url) || url !~ @pattern
         visited_links << url
-        spider_worker = Request.new(url, :timeout => @timeout)
+        spider_worker = ParallelRequest.new(url, :timeout => @timeout)
         response = @setup.yield url unless @setup.nil?
         page = (response ? process_page(URI(url), response) : spider_worker.fetch)
         if page.success? || page.redirect? then
@@ -62,7 +63,7 @@ module Spidercrawl
     def process_page(uri, response)
       page = Page.new(uri, response_code: response.code.to_i,
                            response_head: response.instance_variable_get("@header"),
-                           response_body: response.body
+                           response_body: response.body,
                            crawled_time: (Time.now.to_f*1000).to_i)
     end
   end

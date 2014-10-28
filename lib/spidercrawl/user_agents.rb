@@ -1,4 +1,4 @@
-module SpiderCrawl
+
   class UserAgents
     # Random agents
     def self.random
@@ -22,4 +22,3 @@ module SpiderCrawl
       end  
     end
   end
-end
