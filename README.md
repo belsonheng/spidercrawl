@@ -33,9 +33,38 @@ To include a pattern matching for each page:
     pages = Spiderman.shoot('http://forums.hardwarezone.com.sg/hwm-magazine-publication-38/',
                             :pattern => Regexp.new('^http:\/\/forums\.hardwarezone\.com\.sg\/hwm-magazine-publication-38\/?(.*\.html)?$')
 
+Access the following scraped data:
+
+    pages.each do |page|
+      page.url              #URL of the page
+      page.scheme           #Scheme of the page (http, https, etc.)
+      page.host             #Hostname of the page
+      page.base_url         #Root URL of the page
+      page.doc              #Nokogiri document
+      page.headers          #Response headers for the page
+      page.title            #Title of the page
+      page.links            #Every link found in the page, returned as an array
+      page.internal_links   #Only internal links returned as an array
+      page.external_links   #Only external links returned as an array
+      page.emails           #Every email found in the page, returned as an array
+      page.images           #Every img found in the page, returned as an array
+      page.words            #Every word that appeared in the page, returned as an array
+      page.css              #CSS scripts used in the page, returned as an array
+      page.content          #Contents of the HTML document in string
+      page.content_type     #Content type of the page
+      page.text             #Any text found in the page without HTML tags
+      page.response_code    #HTTP response code of the page
+      page.response_time    #HTTP response time of the page
+      page.crawled_time     #The time when this page is crawled/fetched
+    end
+
 ## Dependencies
 
-Nokogiri 1.6
++ CGI
++ Colorize
++ Curb
++ Nokogiri
++ Typhoeus
 
 ## Contributing
 
