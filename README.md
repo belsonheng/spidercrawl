@@ -60,11 +60,11 @@ Access the following scraped data:
 
 ## Dependencies
 
-CGI
-Colorize
-Curb
-Nokogiri
-Typhoeus
++CGI
++Colorize
++Curb
++Nokogiri
++Typhoeus
 
 ## Contributing
 
