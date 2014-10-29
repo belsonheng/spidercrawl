@@ -12,7 +12,7 @@ module Spidercrawl
       @url = url
       #@headers = options[:headers]
       @delay = options[:delay] ? options[:delay] : 0 # default 0 seconds
-      @threads = options[:threads] ? options[:threads] : 10 # default 10 seconds
+      @threads = options[:threads] ? options[:threads] : 20 # default 20 threads
       @timeout = options[:timeout] ? options[:timeout] : 20 # default 20 seconds
       @allow_redirections = options[:allow_redirections]
       @max_pages = options[:max_pages]
@@ -27,6 +27,7 @@ module Spidercrawl
       link_queue << @url
 
       spider_worker = Request.new(@url, :threads => @threads, :timeout => @timeout)
+
       begin
         url = link_queue.pop
         next if visited_links.include?(url) || url !~ @pattern
@@ -50,6 +51,53 @@ module Spidercrawl
         end
         @teardown.yield url, page unless @teardown.nil?
         sleep @delay
+      end until link_queue.empty?
+      puts "Total pages crawled: #{visited_links.size}"
+      pages
+    end
+
+    def parallel_crawl
+      link_queue = Queue.new
+      pages, visited_links = [], []
+      link_queue << @url
+
+      spider_workers = ParallelRequest.new([@url], :threads => @threads, :timeout => @timeout)
+
+      begin
+        urls = []
+        while !link_queue.empty?
+          url = link_queue.pop
+          next if visited_links.include?(url) || url !~ @pattern
+          visited_links << url
+          response = @setup.yield url unless @setup.nil?
+          urls << url unless response
+          puts "queue: #{url}"
+        end
+
+        spider_workers.urls = urls
+        responses = spider_workers.fetch
+
+        puts "Total Responses: #{responses.size}"
+        begin
+          responses.each do |page|
+            if page.success? || page.redirect? then
+              while page.redirect?
+                break if visited_links.include?(page.location)
+                visited_links << (spider_workers.urls = [page.location])[0]
+                page = spider_workers.fetch[0]
+              end
+              pages << page
+              page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
+            elsif page.not_found? then
+              puts "page not found"
+            end
+            @teardown.yield url, page unless @teardown.nil?
+            sleep @delay
+          end
+        rescue Exception => e
+          puts e.inspect
+          puts e.backtrace
+        end
       end until link_queue.empty?
       puts "Total pages crawled: #{visited_links.size}"
       pages
