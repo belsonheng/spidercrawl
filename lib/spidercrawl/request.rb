@@ -3,7 +3,7 @@ require 'spidercrawl/user_agents'
 require 'net/http'
 require 'curb'
 require 'colorize'
-#require 'typhoeus'
+require 'typhoeus'
 
 module Spidercrawl
   # Makes the request to the targeted website
@@ -61,7 +61,7 @@ module Spidercrawl
     end
 
     #
-    # Fetch a page from the given url
+    # Fetch a page from the given url using net/http
     #
     def fetch
       puts "fetching #{@uri.to_s}".green.on_black
@@ -94,8 +94,8 @@ module Spidercrawl
       end
     end
   end
+
   # Makes parallel requests to the targeted website using typhoeus and hydra
-=begin
   class ParallelRequest
     
     attr_accessor :urls
@@ -118,19 +118,28 @@ module Spidercrawl
         request.on_complete do |response|
           uri = URI(url)
           if response.success?
-          	puts "fetching #{url}"
+          	puts "fetching #{url}".green.on_black
             page = Page.new(uri, response_code: response.code,
                                  response_head: response.headers,
                                  response_body: response.body,
                                  response_time: response.total_time,
                                  crawled_time: (Time.now.to_f*1000).to_i)
           elsif (300..307).include?(response.code)
+          	puts "fetching #{url}".green.on_black
+          	puts "### redirect to #{response.headers['Location']}".white.on_black
             page = Page.new(uri, response_code: response.code,
                                  response_head: response.headers,
                                  response_body: response.body,
                                  response_time: response.total_time,
                                  redirect_url:  response.headers['Location'])
           elsif 404 == response.code
+          	puts "fetching #{url}".green.on_black
+          	puts "### 404 - not found".magenta.on_black
+            page = Page.new(uri, response_code: response.code,
+                                 response_time: response.total_time)
+          else
+          	puts "fetching #{url}".green.on_black
+          	puts "### #{response.code} - failed".magenta.on_black
             page = Page.new(uri, response_code: response.code,
                                  response_time: response.total_time)
           end
@@ -138,9 +147,8 @@ module Spidercrawl
         end
         hydra.queue(request)
       end
-
       hydra.run
       return pages
     end
-=end
+  end
 end
