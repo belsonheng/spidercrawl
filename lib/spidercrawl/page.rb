@@ -1,3 +1,4 @@
+require 'cgi'
 require 'nokogiri'
 
 module Spidercrawl
@@ -179,8 +180,7 @@ module Spidercrawl
     #
     private
     def absolutify(page_url)
-      page_url = page_url.split('?')[0].split('#')[0]
-      return page_url if URI(page_url).absolute?
+      return CGI::escape(page_url) if page_url =~ /^\w*\:/i
       URI.join(base_url, page_url).to_s
     end
   end

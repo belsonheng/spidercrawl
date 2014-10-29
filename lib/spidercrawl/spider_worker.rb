@@ -12,7 +12,7 @@ module Spidercrawl
       @url = url
       #@headers = options[:headers]
       @delay = options[:delay] ? options[:delay] : 0 # default 0 seconds
-      @threads = options[:threads] ? options[:threads] : 20 # default 20 threads
+      @threads = options[:threads] ? options[:threads] : 10 # default 10 threads
       @timeout = options[:timeout] ? options[:timeout] : 20 # default 20 seconds
       @allow_redirections = options[:allow_redirections]
       @max_pages = options[:max_pages]
@@ -77,26 +77,20 @@ module Spidercrawl
         spider_workers.urls = urls
         responses = spider_workers.fetch
 
-        puts "Total Responses: #{responses.size}"
-        begin
-          responses.each do |page|
-            if page.success? || page.redirect? then
-              while page.redirect?
-                break if visited_links.include?(page.location)
-                visited_links << (spider_workers.urls = [page.location])[0]
-                page = spider_workers.fetch[0]
-              end
-              pages << page
-              page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
-            elsif page.not_found? then
-              puts "page not found"
+        responses.each do |page|
+          if page.success? || page.redirect? then
+            while page.redirect?
+              break if visited_links.include?(page.location)
+              visited_links << (spider_workers.urls = [page.location])[0]
+              page = spider_workers.fetch[0]
             end
-            @teardown.yield url, page unless @teardown.nil?
-            sleep @delay
+            pages << page
+            page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
+          elsif page.not_found? then
+            puts "page not found"
           end
-        rescue Exception => e
-          puts e.inspect
-          puts e.backtrace
+          @teardown.yield url, page unless @teardown.nil?
+          sleep @delay
         end
       end until link_queue.empty?
       puts "Total pages crawled: #{visited_links.size}"
