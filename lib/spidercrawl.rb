@@ -5,6 +5,6 @@ class Spiderman
     spiderman = Spidercrawl::SpiderWorker.new(urls, options)
     yield spiderman if block_given?
     spiderman.parallel_crawl if options[:parallel] == true
-    spiderman.crawl if options[:parallel] == false
+    spiderman.crawl unless options[:parallel]
   end
 end
