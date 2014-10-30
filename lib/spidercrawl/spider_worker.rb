@@ -34,8 +34,10 @@ module Spidercrawl
         visited_links << url
         spider_worker.uri = URI.parse(url)
 
+        start_time = Time.now
         response = @setup.yield url unless @setup.nil?
-        page = (response ? setup_page(URI(url), response) : spider_worker.curl)
+        end_time = Time.now
+        page = (response ? setup_page(URI(url), response, ((end_time-start_time)*1000).round) : spider_worker.curl)
 
         if page.success? || page.redirect? then
           while page.redirect?
@@ -44,7 +46,7 @@ module Spidercrawl
             visited_links << (spider_worker.uri = URI.parse(page.location)).to_s
             page = spider_worker.curl
           end
-          pages << page
+          pages << page unless page.content == ""
           page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
         elsif page.not_found? then
           puts "page not found"
@@ -69,9 +71,16 @@ module Spidercrawl
           url = link_queue.pop
           next if visited_links.include?(url) || url !~ @pattern
           visited_links << url
+          start_time = Time.now
           response = @setup.yield url unless @setup.nil?
-          urls << url unless response
-          puts "queue: #{url}"
+          end_time = Time.now
+          if response
+            pages << (page = setup_page(URI(url), response, ((end_time-start_time)*1000).round))
+            page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
+          else 
+            urls << url
+            puts "queue: #{url}"
+          end
         end
 
         spider_workers.urls = urls
@@ -84,7 +93,7 @@ module Spidercrawl
               visited_links << (spider_workers.urls = [page.location])[0]
               page = spider_workers.fetch[0]
             end
-            pages << page
+            pages << page unless page.content == ""
             page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
           elsif page.not_found? then
             puts "page not found"
@@ -118,10 +127,11 @@ module Spidercrawl
     # Setup page based on given response
     #
     private
-    def setup_page(uri, response)
+    def setup_page(uri, response, response_time)
       page = Page.new(uri, response_code: response.code.to_i,
                            response_head: response.instance_variable_get("@header"),
                            response_body: response.body,
+                           response_time: response_time,
                            crawled_time: (Time.now.to_f*1000).to_i)
     end
   end
