@@ -49,7 +49,7 @@ module Spidercrawl
         elsif page.not_found? then
           puts "page not found"
         end
-        @teardown.yield url, page unless @teardown.nil?
+        @teardown.yield page unless @teardown.nil?
         sleep @delay
       end until link_queue.empty?
       puts "Total pages crawled: #{visited_links.size}"
@@ -89,8 +89,7 @@ module Spidercrawl
           elsif page.not_found? then
             puts "page not found"
           end
-          @teardown.yield url, page unless @teardown.nil?
-          sleep @delay
+          @teardown.yield page unless @teardown.nil?
         end
       end until link_queue.empty?
       puts "Total pages crawled: #{visited_links.size}"
