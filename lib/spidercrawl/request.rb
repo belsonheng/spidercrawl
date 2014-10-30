@@ -114,7 +114,7 @@ module Spidercrawl
       page, pages = nil, []
 
       @urls.each do |url|
-        request = Typhoeus::Request.new(url, :timeout => @timeout, :followlocation => false, :headers => {"User-Agent" => UserAgents.random})
+        request = Typhoeus::Request.new(url, :timeout => @timeout, :followlocation => false, :headers => {"Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "Cache-Control" => "no-cache", "Pragma" => "no-cache", "User-Agent" => UserAgents.random})
         request.on_complete do |response|
           uri = URI(url)
           if response.success?
