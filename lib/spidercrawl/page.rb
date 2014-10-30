@@ -176,7 +176,7 @@ module Spidercrawl
     end
 
     #
-    # Return the absolute url without query params, etc.
+    # Return the absolute url
     #
     private
     def absolutify(page_url)
