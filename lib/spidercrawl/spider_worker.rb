@@ -37,7 +37,7 @@ module Spidercrawl
         start_time = Time.now
         response = @setup.yield url unless @setup.nil?
         end_time = Time.now
-        page = (response ? setup_page(URI(url), response, ((end_time-start_time)*1000).round) : spider_worker.curl)
+        page = (response ? setup_page(URI(url), response, ((end_time - start_time).to_f*1000).to_i) : spider_worker.curl)
 
         if page.success? || page.redirect? then
           while page.redirect?
@@ -75,7 +75,7 @@ module Spidercrawl
           response = @setup.yield url unless @setup.nil?
           end_time = Time.now
           if response
-            pages << (page = setup_page(URI(url), response, ((end_time-start_time)*1000).round))
+            pages << (page = setup_page(URI(url), response, ((end_time - start_time).to_f*1000).to_i))
             page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
           else 
             urls << url

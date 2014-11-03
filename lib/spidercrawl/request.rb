@@ -76,17 +76,17 @@ module Spidercrawl
           page = Page.new(@uri, response_code: response.code.to_i,
                                 response_head: response.instance_variable_get("@header"),
                                 response_body: response.body,
-                                response_time: ((end_time-start_time)*1000).round,
+                                response_time: (end_time-start_time).to_f,
                                 crawled_time: (Time.now.to_f*1000).to_i)
         when Net::HTTPRedirection then
           page = Page.new(@uri, response_code: response.code.to_i,
                                 response_head: response.instance_variable_get("@header"),
                                 response_body: response.body,
-                                response_time: ((end_time-start_time)*1000).round,
+                                response_time: (end_time-start_time).to_f,
                                 redirect_url:  response['location'])
         when Net::HTTPNotFound then
           page = Page.new(@uri, response_code: response.code.to_i,
-                                response_time: ((end_time-start_time)*1000).round)
+                                response_time: (end_time-start_time).to_f)
         end
       rescue Exception => e
         puts e.inspect
@@ -122,7 +122,7 @@ module Spidercrawl
             page = Page.new(uri, response_code: response.code,
                                  response_head: response.headers,
                                  response_body: response.body,
-                                 response_time: response.total_time,
+                                 response_time: response.time,
                                  crawled_time: (Time.now.to_f*1000).to_i)
           elsif (300..307).include?(response.code)
             puts "fetching #{url}".green.on_black
@@ -130,13 +130,13 @@ module Spidercrawl
             page = Page.new(uri, response_code: response.code,
                                  response_head: response.headers,
                                  response_body: response.body,
-                                 response_time: response.total_time,
+                                 response_time: response.time,
                                  redirect_url:  response.headers['Location'])
           elsif 404 == response.code
             puts "fetching #{url}".green.on_black
             puts "### 404 - not found".magenta.on_black
             page = Page.new(uri, response_code: response.code,
-                                 response_time: response.total_time)
+                                 response_time: response.time)
           else
             puts "fetching #{url}".green.on_black
             puts "### #{response.code} - failed".magenta.on_black
