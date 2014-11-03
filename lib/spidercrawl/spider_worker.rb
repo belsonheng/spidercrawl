@@ -76,6 +76,7 @@ module Spidercrawl
           end_time = Time.now
           if response
             pages << (page = setup_page(URI(url), response, ((end_time - start_time).to_f*1000).to_i))
+            @teardown.yield page unless @teardown.nil?
             page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
           else 
             urls << url
@@ -98,6 +99,7 @@ module Spidercrawl
           elsif page.not_found? then
             puts "page not found"
           end
+          page.crawled_time = (Time.now.to_f*1000).to_i
           @teardown.yield page unless @teardown.nil?
         end
       end until link_queue.empty?

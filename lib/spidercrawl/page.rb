@@ -5,7 +5,8 @@ module Spidercrawl
   # Parses the content with Nokogiri
   class Page
 
-    attr_reader :location, :response_time, :crawled_time
+    attr_reader :location, :response_time
+    attr_accessor :crawled_time
 
     def initialize(url, options = {})
       @url = url

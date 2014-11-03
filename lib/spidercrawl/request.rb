@@ -122,8 +122,7 @@ module Spidercrawl
             page = Page.new(uri, response_code: response.code,
                                  response_head: response.headers,
                                  response_body: response.body,
-                                 response_time: response.time,
-                                 crawled_time: (Time.now.to_f*1000).to_i)
+                                 response_time: response.time)
           elsif (300..307).include?(response.code)
             puts "fetching #{url}".green.on_black
             puts "### redirect to #{response.headers['Location']}".white.on_black
