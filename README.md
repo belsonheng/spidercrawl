@@ -55,7 +55,7 @@ Access the following scraped data:
       page.text             #Any text found in the page without HTML tags
       page.response_code    #HTTP response code of the page
       page.response_time    #HTTP response time of the page
-      page.crawled_time     #The time when this page is crawled/fetched
+      page.crawled_time     #The time when this page is crawled/fetched, returned as milliseconds since epoch
     end
 
 ## Dependencies
