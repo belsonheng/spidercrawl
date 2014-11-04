@@ -180,8 +180,8 @@ module Spidercrawl
     #
     private
     def absolutify(page_url)
-      return URI.parse(URI.escape(page_url)) if page_url =~ /^\w*\:/i
-      return URI.parse(base_url + URI.escape(page_url))
+      return URI.escape(page_url) if page_url =~ /^\w*\:/i
+      return base_url + URI.escape(page_url)
     end
   end
 end
