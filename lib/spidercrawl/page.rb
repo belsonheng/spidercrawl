@@ -1,4 +1,3 @@
-require 'cgi'
 require 'nokogiri'
 
 module Spidercrawl
@@ -74,7 +73,7 @@ module Spidercrawl
     # Return the entire links found in the page; exclude empty links
     #
     def links
-      @links = doc.css('a').map { |link| link['href'].to_s }.uniq.delete_if { |href| href.empty? }.map { |url| absolutify(url) }
+      @links = doc.css('a').map { |link| link['href'].to_s }.uniq.delete_if { |href| href.empty? }.map { |url| absolutify(url.strip) }
     end
 
     #
@@ -102,7 +101,7 @@ module Spidercrawl
     # Return all images found in the page
     #
     def images
-      @images = doc.css('img').map { |img| img['src'].to_s }.uniq.delete_if { |src| src.empty? }.map { |url| absolutify(url) }
+      @images = doc.css('img').map { |img| img['src'].to_s }.uniq.delete_if { |src| src.empty? }.map { |url| absolutify(url.strip) }
     end
 
     #
@@ -181,8 +180,8 @@ module Spidercrawl
     #
     private
     def absolutify(page_url)
-      return CGI::escape(page_url) if page_url =~ /^\w*\:/i
-      URI.join(base_url, page_url).to_s
+      return URI.parse(URI.escape(page_url)) if page_url =~ /^\w*\:/i
+      return URI.parse(base_url + URI.escape(page_url))
     end
   end
 end

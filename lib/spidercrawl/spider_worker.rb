@@ -30,7 +30,8 @@ module Spidercrawl
 
       begin
         url = link_queue.pop
-        next if visited_links.include?(url) || url !~ @pattern
+        next if visited_links.include?(url) 
+        next if @pattern && url !~ @pattern
         visited_links << url
         spider_worker.uri = URI.parse(url)
 
@@ -47,7 +48,15 @@ module Spidercrawl
             page = spider_worker.curl
           end
           pages << page unless page.content == ""
-          page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
+          page.internal_links.each do |link| 
+            if !visited_links.include?(link) 
+              if @pattern
+                link_queue << link if link =~ @pattern
+              else
+                link_queue << link
+              end
+            end
+          end
         elsif page.not_found? then
           puts "page not found"
         end
@@ -69,7 +78,8 @@ module Spidercrawl
         urls = []
         while !link_queue.empty?
           url = link_queue.pop
-          next if visited_links.include?(url) || url !~ @pattern
+          next if visited_links.include?(url)
+          next if @pattern && url !~ @pattern
           visited_links << url
           start_time = Time.now
           response = @setup.yield url unless @setup.nil?
@@ -77,7 +87,15 @@ module Spidercrawl
           if response
             pages << (page = setup_page(URI(url), response, ((end_time - start_time).to_f*1000).to_i))
             @teardown.yield page unless @teardown.nil?
-            page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
+            page.internal_links.each do |link| 
+              if !visited_links.include?(link) 
+                if @pattern
+                  link_queue << link if link =~ @pattern
+                else
+                  link_queue << link
+                end
+              end
+            end
           else 
             urls << url
             puts "queue: #{url}"
@@ -95,7 +113,15 @@ module Spidercrawl
               page = spider_workers.fetch[0]
             end
             pages << page unless page.content == ""
-            page.internal_links.each { |link| link_queue << link if !visited_links.include?(link) && link =~ @pattern }
+            page.internal_links.each do |link| 
+              if !visited_links.include?(link) 
+                if @pattern
+                  link_queue << link if link =~ @pattern
+                else
+                  link_queue << link
+                end
+              end
+            end
           elsif page.not_found? then
             puts "page not found"
           end

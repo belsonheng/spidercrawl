@@ -122,25 +122,26 @@ module Spidercrawl
             page = Page.new(uri, response_code: response.code,
                                  response_head: response.headers,
                                  response_body: response.body,
-                                 response_time: response.time)
+                                 response_time: response.time*1000,
+                                 crawled_time: (Time.now.to_f*1000).to_i)
           elsif (300..307).include?(response.code)
             puts "fetching #{url}".green.on_black
             puts "### redirect to #{response.headers['Location']}".white.on_black
             page = Page.new(uri, response_code: response.code,
                                  response_head: response.headers,
                                  response_body: response.body,
-                                 response_time: response.time,
+                                 response_time: response.time*1000,
                                  redirect_url:  response.headers['Location'])
           elsif 404 == response.code
             puts "fetching #{url}".green.on_black
             puts "### 404 - not found".magenta.on_black
             page = Page.new(uri, response_code: response.code,
-                                 response_time: response.time)
+                                 response_time: response.time*1000)
           else
             puts "fetching #{url}".green.on_black
             puts "### #{response.code} - failed".magenta.on_black
             page = Page.new(uri, response_code: response.code,
-                                 response_time: response.total_time)
+                                 response_time: response.time*1000)
           end
           pages << page
         end
