@@ -60,7 +60,6 @@ Access the following scraped data:
 
 ## Dependencies
 
-+ CGI
 + Colorize
 + Curb
 + Nokogiri
