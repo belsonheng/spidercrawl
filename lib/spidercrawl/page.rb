@@ -80,14 +80,14 @@ module Spidercrawl
     # Return the internal links found in the page
     #
     def internal_links
-      @internal_links = links.select { |link| URI(link).host == host }
+      @internal_links = links.select { |link| URI.parse(link).host == host } rescue nil
     end
 
     #
     # Return the external links found in the page
     #
     def external_links
-      @external_links = links.select { |link| URI(link).host != host }
+      @external_links = links.select { |link| URI.parse(link).host != host } rescue nil
     end
 
     #
