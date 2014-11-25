@@ -121,7 +121,7 @@ module Spidercrawl
                   link_queue << link
                 end
               end
-            end
+            end unless page.internal_links.nil?
           elsif page.not_found? then
             puts "page not found"
           end
