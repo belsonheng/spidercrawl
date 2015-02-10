@@ -60,6 +60,7 @@ module Spidercrawl
             end
             @teardown.yield page unless @teardown.nil?
             sleep @delay
+          end
         elsif page.not_found? then
           puts "page not found"
         end
