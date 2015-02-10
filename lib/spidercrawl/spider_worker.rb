@@ -47,21 +47,22 @@ module Spidercrawl
             visited_links << (spider_worker.uri = URI.parse(page.location)).to_s
             page = spider_worker.curl
           end
-          pages << page unless page.content == ""
-          page.internal_links.each do |link| 
-            if !visited_links.include?(link) 
-              if @pattern
-                link_queue << link if link =~ @pattern
-              else
-                link_queue << link
+          unless visited_links.include?(page.location)
+            pages << page unless page.content == ""
+            page.internal_links.each do |link| 
+              if !visited_links.include?(link) 
+                if @pattern
+                  link_queue << link if link =~ @pattern
+                else
+                  link_queue << link
+                end
               end
             end
-          end
+            @teardown.yield page unless @teardown.nil?
+            sleep @delay
         elsif page.not_found? then
           puts "page not found"
         end
-        @teardown.yield page unless @teardown.nil?
-        sleep @delay
       end until link_queue.empty?
       puts "Total pages crawled: #{visited_links.size}"
       pages
