@@ -57,7 +57,7 @@ module Spidercrawl
                   link_queue << link
                 end
               end
-            end
+            end rescue nil
             @teardown.yield page unless @teardown.nil?
             sleep @delay
           end
