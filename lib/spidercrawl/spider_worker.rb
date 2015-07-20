@@ -42,7 +42,7 @@ module Spidercrawl
         response = @setup.yield url unless @setup.nil?
         end_time = Time.now
 
-        page = (response ? setup_page(URI(url), response, ((end_time - start_time).to_f*1000).to_i) : spider_worker.curl)
+        page = (response ? setup_page(URI.parse(url), response, ((end_time - start_time).to_f*1000).to_i) : spider_worker.curl)
 
         if page.success? || page.redirect? then
           while page.redirect?
@@ -53,9 +53,9 @@ module Spidercrawl
             response = @redirect.yield page.location unless @redirect.nil?
             end_time = Time.now
 
-            spider_worker.uri = (URI(page.location)).to_s
-            page = (response ? setup_page(URI(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_worker.curl)
-            visited_links << page
+            spider_worker.uri = URI.parse(page.location)
+            page = (response ? setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_worker.curl)
+            visited_links << page.url
           end
           unless visited_links.include?(page.location)
             pages << page unless page.content == ""
@@ -76,6 +76,7 @@ module Spidercrawl
         end
       end until link_queue.empty?
       puts "Total pages crawled: #{visited_links.size}"
+      puts visited_links
       pages
     end
 
