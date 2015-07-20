@@ -19,6 +19,9 @@ module Spidercrawl
       @pattern = options[:pattern]
       @setup = nil
       @teardown = nil
+      @redirect = nil
+      @success = nil
+      @failure = nil
     end
 
     def crawl
@@ -38,14 +41,21 @@ module Spidercrawl
         start_time = Time.now
         response = @setup.yield url unless @setup.nil?
         end_time = Time.now
+
         page = (response ? setup_page(URI(url), response, ((end_time - start_time).to_f*1000).to_i) : spider_worker.curl)
 
         if page.success? || page.redirect? then
           while page.redirect?
             puts ("### redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")).white.on_black
             break if visited_links.include?(page.location)
-            visited_links << (spider_worker.uri = URI.parse(page.location)).to_s
-            page = spider_worker.curl
+            
+            start_time = Time.now
+            response = @redirect.yield page.location unless @redirect.nil?
+            end_time = Time.now
+
+            spider_worker.uri = (URI(page.location)).to_s
+            page = (response ? setup_page(URI(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_worker.curl
+            visited_links << page
           end
           unless visited_links.include?(page.location)
             pages << page unless page.content == ""
@@ -149,8 +159,25 @@ module Spidercrawl
       @teardown = block if block
     end
 
-    def on()
-      # TODO :success, :failure, :redirect
+    #
+    # Code block for on redirect
+    #
+    def on_redirect(&block)
+      @redirect = block if block
+    end
+
+    #
+    # Code block for on success
+    #
+    def on_success(&block)
+      @success = block if block
+    end
+
+    #
+    # Code block for on failure
+    #
+    def on_failure(&block)
+      @failure = block if block
     end
 
     #
