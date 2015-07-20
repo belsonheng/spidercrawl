@@ -54,7 +54,7 @@ module Spidercrawl
             end_time = Time.now
 
             spider_worker.uri = (URI(page.location)).to_s
-            page = (response ? setup_page(URI(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_worker.curl
+            page = (response ? setup_page(URI(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_worker.curl)
             visited_links << page
           end
           unless visited_links.include?(page.location)
