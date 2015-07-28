@@ -121,7 +121,7 @@ module Spidercrawl
             while page.redirect?
               puts ("### redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")).white.on_black
               break if visited_links.include?(page.location)
-
+              break if @pattern && page.location =~ @pattern
               start_time = Time.now
               response = @redirect.yield page.location unless @redirect.nil?
               end_time = Time.now
@@ -131,6 +131,7 @@ module Spidercrawl
               unless response
                 if @pattern
                   link_queue << page.location if page.location =~ @pattern 
+                  puts "discard url" unless page.location =~ @pattern 
                 else
                   link_queue << page.location
                 end
