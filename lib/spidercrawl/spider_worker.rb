@@ -130,7 +130,7 @@ module Spidercrawl
               #page = (response ? setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_workers.fetch[0])
               unless response
                 if @pattern
-                  link_queue << page.location if link =~ @pattern 
+                  link_queue << page.location if page.location =~ @pattern 
                 else
                   link_queue << page.location
                 end
