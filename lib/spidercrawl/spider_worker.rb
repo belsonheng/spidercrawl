@@ -119,9 +119,16 @@ module Spidercrawl
         responses.each do |page|
           if page.success? || page.redirect? then
             while page.redirect?
+              puts ("### redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")).white.on_black
               break if visited_links.include?(page.location)
-              visited_links << (spider_workers.urls = [page.location])[0]
-              page = spider_workers.fetch[0]
+
+              start_time = Time.now
+              response = @redirect.yield page.location unless @redirect.nil?
+              end_time = Time.now
+
+              spider_workers.urls = [page.location]
+              page = (response ? setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_workers.fetch[0])
+              visited_links << page.url
             end
             pages << page unless page.content == ""
             page.internal_links.each do |link| 
