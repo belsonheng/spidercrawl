@@ -128,9 +128,16 @@ module Spidercrawl
 
               #spider_workers.urls = [page.location]
               #page = (response ? setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_workers.fetch[0])
-              link_queue << page.url unless response #queue up redirected links
-              page = setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i) if response
-              visited_links << page.url
+              unless response
+                if @pattern
+                  link_queue << page.location if link =~ @pattern 
+                else
+                  link_queue << page.location
+                end
+              else
+                page = setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i)
+                visited_links << page.url             
+              end
             end
             pages << page unless page.content == ""
             page.internal_links.each do |link| 
