@@ -75,8 +75,6 @@ module Spidercrawl
           puts "page not found"
         end
       end until link_queue.empty?
-      puts "Total pages crawled: #{visited_links.size}"
-      puts visited_links
       pages
     end
 
@@ -142,7 +140,6 @@ module Spidercrawl
           @teardown.yield page unless @teardown.nil?
         end
       end until link_queue.empty?
-      puts "Total pages crawled: #{visited_links.size}"
       pages
     end
 
