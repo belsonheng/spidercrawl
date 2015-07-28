@@ -117,35 +117,38 @@ module Spidercrawl
         responses = spider_workers.fetch
 
         responses.each do |page|
-          if page.redirect? then
-            puts ("### redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")).white.on_black
-            break if visited_links.include?(page.location) && @pattern && page.location !=~ @pattern
+          if page.success? || page.redirect? then
+            if page.redirect? then
+              puts ("### redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")).white.on_black
+              unless visited_links.include?(page.location) && @pattern && page.location !=~ @pattern
+                start_time = Time.now
+                response = @redirect.yield page.location unless @redirect.nil?
+                end_time = Time.now
 
-            start_time = Time.now
-            response = @redirect.yield page.location unless @redirect.nil?
-            end_time = Time.now
-
-            #spider_workers.urls = [page.location]
-            #page = (response ? setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_workers.fetch[0])
-            
-            if response then
-              page = setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i)
-              visited_links << page.url
-            else
-              puts "queue: #{page.location}"
-              link_queue << page.location
-            end
-          elsif page.success? then
-            pages << page unless page.content == ""
-            page.internal_links.each do |link| 
-              if !visited_links.include?(link) 
-                if @pattern
-                  link_queue << link if link =~ @pattern
+                #spider_workers.urls = [page.location]
+                #page = (response ? setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_workers.fetch[0])
+                
+                if response then
+                  page = setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i)
+                  visited_links << page.url        
                 else
-                  link_queue << link
+                  puts "queue: #{page.location}"
+                  link_queue << page.location
                 end
+              else
+                puts "discard: #{page.location}"
               end
-            end unless page.internal_links.nil?             
+              # page.success do the following
+              pages << page unless page.content == ""
+              page.internal_links.each do |link| 
+                if !visited_links.include?(link) 
+                  if @pattern
+                    link_queue << link if link =~ @pattern
+                  else
+                    link_queue << link
+                  end
+                end
+              end unless page.internal_links.nil?             
           elsif page.not_found? then
             puts "page not found"
           end
