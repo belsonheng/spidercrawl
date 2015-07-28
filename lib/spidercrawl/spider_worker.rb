@@ -138,17 +138,18 @@ module Spidercrawl
               else
                 puts "discard: #{page.location}"
               end
-              # page.success do the following
-              pages << page unless page.content == ""
-              page.internal_links.each do |link| 
-                if !visited_links.include?(link) 
-                  if @pattern
-                    link_queue << link if link =~ @pattern
-                  else
-                    link_queue << link
-                  end
+            end
+            # page.success do the following
+            pages << page unless page.content == ""
+            page.internal_links.each do |link| 
+              if !visited_links.include?(link) 
+                if @pattern
+                  link_queue << link if link =~ @pattern
+                else
+                  link_queue << link
                 end
-              end unless page.internal_links.nil?             
+              end
+            end unless page.internal_links.nil?             
           elsif page.not_found? then
             puts "page not found"
           end
