@@ -136,19 +136,19 @@ module Spidercrawl
                 end
               else
                 page = setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i)
-                visited_links << page.url             
+                visited_links << page.url
+                pages << page unless page.content == ""
+                page.internal_links.each do |link| 
+                  if !visited_links.include?(link) 
+                    if @pattern
+                      link_queue << link if link =~ @pattern
+                    else
+                      link_queue << link
+                    end
+                  end
+                end unless page.internal_links.nil?             
               end
             end
-            pages << page unless page.content == ""
-            page.internal_links.each do |link| 
-              if !visited_links.include?(link) 
-                if @pattern
-                  link_queue << link if link =~ @pattern
-                else
-                  link_queue << link
-                end
-              end
-            end unless page.internal_links.nil?
           elsif page.not_found? then
             puts "page not found"
           end
