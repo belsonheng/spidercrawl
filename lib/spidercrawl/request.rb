@@ -110,7 +110,7 @@ module Spidercrawl
     # Fetch page(s) from the given url(s)
     #
     def fetch
-      hydra = Typhoeus::Hydra.new(:max_concurrency => @threads)
+      hydra = Typhoeus::Hydra.new(:max_concurrency => @threads, :retry_connect_timeouts => true, :retry_codes => [503, 504])
       page, pages = nil, []
 
       @urls.each do |url|
