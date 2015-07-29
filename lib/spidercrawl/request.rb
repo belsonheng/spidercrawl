@@ -139,7 +139,7 @@ module Spidercrawl
                                  response_time: response.time*1000)
           else
             puts "fetching #{url}".green.on_black
-            puts "### #{response.code} - failed".magenta.on_black
+            puts "### #{response.code} ### failed #{url}".magenta.on_black
             page = Page.new(uri, response_code: response.code,
                                  response_time: response.time*1000)
           end
