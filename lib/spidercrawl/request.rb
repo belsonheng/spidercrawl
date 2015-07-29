@@ -144,7 +144,6 @@ module Spidercrawl
             page = Page.new(uri, response_code: response.code,
                                  response_time: response.time*1000)
           end
-          sleep 1
           pages << page
         end
         hydra.queue(request)
