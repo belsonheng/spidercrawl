@@ -119,7 +119,9 @@ module Spidercrawl
         responses = spider_workers.fetch
 
         responses.each do |page|
-          if page.success? || page.redirect? then
+          if (503..504).include?(page.response_code) then
+            link_queue << page.url
+          elsif page.success? || page.redirect? then
             response = nil
             if page.redirect? then
               puts ("### redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")).white.on_black
