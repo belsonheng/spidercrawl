@@ -95,8 +95,8 @@ module Spidercrawl
           start_time = Time.now
           response = @setup.yield url unless @setup.nil?
           end_time = Time.now
-          if response
-            pages << (page = setup_page(URI(url), response, ((end_time - start_time).to_f*1000).to_i))
+          if response then
+            pages << (page = setup_page(URI.parse(url), response, ((end_time - start_time).to_f*1000).to_i))
             @teardown.yield page unless @teardown.nil?
             page.internal_links.each do |link| 
               if !visited_links.include?(link) 
@@ -118,6 +118,7 @@ module Spidercrawl
 
         responses.each do |page|
           if page.success? || page.redirect? then
+            response = nil
             if page.redirect? then
               puts ("### redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")).white.on_black
               unless visited_links.include?(page.location) || (@pattern && page.location !~ @pattern)
@@ -139,22 +140,23 @@ module Spidercrawl
                 puts "discard: #{page.location}"
               end
             end
-            # page.success do the following
-            pages << page unless page.content == ""
-            page.internal_links.each do |link| 
-              if !visited_links.include?(link) 
-                if @pattern
-                  link_queue << link if link =~ @pattern
-                else
-                  link_queue << link
+            if page.success? || response then
+              pages << page unless page.content == ""
+              page.internal_links.each do |link| 
+                if !visited_links.include?(link) 
+                  if @pattern
+                    link_queue << link if link =~ @pattern
+                  else
+                    link_queue << link
+                  end
                 end
-              end
-            end unless page.internal_links.nil?             
+              end unless page.internal_links.nil?
+              page.crawled_time = (Time.now.to_f*1000).to_i
+              @teardown.yield page unless @teardown.nil?
+            end
           elsif page.not_found? then
             puts "page not found"
           end
-          page.crawled_time = (Time.now.to_f*1000).to_i
-          @teardown.yield page unless @teardown.nil?
         end
       end until link_queue.empty?
       pages
