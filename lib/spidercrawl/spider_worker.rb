@@ -120,7 +120,7 @@ module Spidercrawl
           if page.success? || page.redirect? then
             if page.redirect? then
               puts ("### redirect to #{page.location}" + (visited_links.include?(page.location) ? " which we have already visited!" : "")).white.on_black
-              unless visited_links.include?(page.location) && @pattern && page.location !=~ @pattern
+              unless visited_links.include?(page.location) || (@pattern && page.location !~ @pattern)
                 start_time = Time.now
                 response = @redirect.yield page.location unless @redirect.nil?
                 end_time = Time.now
