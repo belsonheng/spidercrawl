@@ -89,16 +89,18 @@ module Spidercrawl
         urls = []
         while !link_queue.empty?
           url = link_queue.pop
-          next if visited_links.include?(url)
-          next if @pattern && url !~ @pattern
+          next if visited_links.include?(url) || (@pattern && url !~ @pattern)
           visited_links << url
+
           start_time = Time.now
           response = @setup.yield url unless @setup.nil?
           end_time = Time.now
+          
           if response then
             pages << (page = setup_page(URI.parse(url), response, ((end_time - start_time).to_f*1000).to_i))
             @teardown.yield page unless @teardown.nil?
-            page.internal_links.each do |link| 
+
+            page.internal_links.each do |link| # queue up internal links for crawling 
               if !visited_links.include?(link) 
                 if @pattern
                   link_queue << link if link =~ @pattern
@@ -106,8 +108,8 @@ module Spidercrawl
                   link_queue << link
                 end
               end
-            end
-          else 
+            end unless page.internal_links.nil?
+          else # queue up url for crawling 
             urls << url
             puts "queue: #{url}"
           end
@@ -126,9 +128,6 @@ module Spidercrawl
                 response = @redirect.yield page.location unless @redirect.nil?
                 end_time = Time.now
 
-                #spider_workers.urls = [page.location]
-                #page = (response ? setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_workers.fetch[0])
-                
                 if response then
                   page = setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i)
                   visited_links << page.url        
@@ -142,7 +141,8 @@ module Spidercrawl
             end
             if page.success? || response then
               pages << page unless page.content == ""
-              page.internal_links.each do |link| 
+
+              page.internal_links.each do |link| # queue up internal links for crawling
                 if !visited_links.include?(link) 
                   if @pattern
                     link_queue << link if link =~ @pattern
