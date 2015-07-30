@@ -33,16 +33,15 @@ module Spidercrawl
 
       begin
         url = link_queue.pop
-        next if visited_links.include?(url) 
-        next if (@pattern && url !~ @pattern)
-        visited_links << url
-        spider_worker.uri = URI.parse(url)
+        next if visited_links.include?(url) || (@pattern && url !~ @pattern)
 
         start_time = Time.now
         response = @setup.yield url unless @setup.nil?
         end_time = Time.now
-
+        
+        spider_worker.uri = URI.parse(url)
         page = (response ? setup_page(URI.parse(url), response, ((end_time - start_time).to_f*1000).to_i) : spider_worker.curl)
+        visited_links << url
 
         if page.success? || page.redirect? then
           while page.redirect?
@@ -57,7 +56,7 @@ module Spidercrawl
             page = (response ? setup_page(URI.parse(page.location), response, ((end_time - start_time).to_f*1000).to_i) : spider_worker.curl)
             visited_links << page.url
           end
-          unless visited_links.include?(page.location)
+          if !visited_links.include?(page.location)
             pages << page unless page.content == ""
             page.internal_links.each do |link| 
               if !visited_links.include?(link) 
@@ -67,7 +66,7 @@ module Spidercrawl
                   link_queue << link
                 end
               end
-            end rescue nil
+            end unless page.internal_links.nil?
             @teardown.yield page unless @teardown.nil?
             sleep @delay
           end
@@ -75,6 +74,8 @@ module Spidercrawl
           puts "page not found"
         end
       end until link_queue.empty?
+      puts "@@@"
+      puts visited_links
       pages
     end
 
