@@ -60,11 +60,8 @@ module Spidercrawl
             pages << page unless page.content == ""
             page.internal_links.each do |link|
               if !visited_links.include?(link) 
-                if @pattern
-                  link_queue << link if link =~ @pattern
-                else
-                  link_queue << link
-                end
+                link_queue << link if @pattern && link =~ @pattern
+                link_queue << link unless @pattern
               end
             end unless page.internal_links.nil?
             @teardown.yield page unless @teardown.nil?
@@ -74,7 +71,6 @@ module Spidercrawl
           puts "page not found"
         end
       end until link_queue.empty?
-      puts visited_links
       pages
     end
 
@@ -102,11 +98,8 @@ module Spidercrawl
 
             page.internal_links.each do |link| # queue up internal links for crawling 
               if !visited_links.include?(link) 
-                if @pattern
-                  link_queue << link if link =~ @pattern
-                else
-                  link_queue << link
-                end
+                link_queue << link if @pattern && link =~ @pattern
+                link_queue << link unless @pattern
               end
             end unless page.internal_links.nil?
           else # queue up url for crawling 
@@ -146,11 +139,8 @@ module Spidercrawl
 
               page.internal_links.each do |link| # queue up internal links for crawling
                 if !visited_links.include?(link) 
-                  if @pattern
-                    link_queue << link if link =~ @pattern
-                  else
-                    link_queue << link
-                  end
+                  link_queue << link if @pattern && link =~ @pattern
+                  link_queue << link unless @pattern
                 end
               end unless page.internal_links.nil?
               page.crawled_time = (Time.now.to_f*1000).to_i
