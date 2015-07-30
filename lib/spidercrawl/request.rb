@@ -134,7 +134,7 @@ module Spidercrawl
                                  redirect_url:  response.headers['Location'])
           elsif 404 == response.code
             puts "fetching #{url}".green.on_black
-            puts "### 404 - not found".magenta.on_black
+            puts "### #{response.code} ### not found #{url}".magenta.on_black
             page = Page.new(uri, response_code: response.code,
                                  response_time: response.time*1000)
           else
