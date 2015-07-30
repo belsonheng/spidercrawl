@@ -33,7 +33,8 @@ module Spidercrawl
 
       begin
         url = link_queue.pop
-        next if visited_links.include?(url) || (@pattern && url !~ @pattern)
+        next if visited_links.include?(url) 
+        next if (@pattern && url !~ @pattern)
         visited_links << url
         spider_worker.uri = URI.parse(url)
 
