@@ -58,7 +58,7 @@ module Spidercrawl
           end
           if !visited_links.include?(page.location)
             pages << page unless page.content == ""
-            page.internal_links.each do |link| 
+            page.internal_links.each do |link|
               if !visited_links.include?(link) 
                 if @pattern
                   link_queue << link if link =~ @pattern
@@ -74,7 +74,6 @@ module Spidercrawl
           puts "page not found"
         end
       end until link_queue.empty?
-      puts "@@@"
       puts visited_links
       pages
     end
