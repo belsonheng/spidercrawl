@@ -136,7 +136,6 @@ module Spidercrawl
             end
             if page.success? || response then
               pages << page unless page.content == ""
-
               page.internal_links.each do |link| # queue up internal links for crawling
                 if !visited_links.include?(link) 
                   link_queue << link if @pattern && link =~ @pattern
