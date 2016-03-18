@@ -58,6 +58,10 @@ Access the following scraped data:
       page.crawled_time     #The time when this page is crawled/fetched, returned as milliseconds since epoch
     end
 
+## TODO
++ Include faraday
++ Replace curb dependency with patron
+
 ## Dependencies
 
 + Colorize
